@@ -50,6 +50,11 @@ class _BodyState extends State<Body> {
   double latitude = 0.0;
   double longitude = 0.0;
   File? _image;
+  TextEditingController judul = TextEditingController();
+  String Judul = '';
+  String Keterangan = '';
+  String Tanggal = '';
+  String Biaya = '';
 
   void handleAutoFill() {
     setState(() {
@@ -120,6 +125,9 @@ class _BodyState extends State<Body> {
                           )),
               ),
             ),
+            SizedBox(
+              height: 20,
+            ),
             Text(
               "*Pastikan Resep obat, kwitansi & tampak ",
               style: TextStyle(color: Color(0xFFBC0D0D)),
@@ -140,6 +148,12 @@ class _BodyState extends State<Body> {
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
+                      controller: judul,
+                      onChanged: (value) {
+                        setState(() {
+                          Judul = value;
+                        });
+                      },
                       decoration: InputDecoration(
                         labelText: 'Masukkan Judul Catatan Anda',
                         border: OutlineInputBorder(
@@ -165,6 +179,12 @@ class _BodyState extends State<Body> {
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
+                      controller: judul,
+                      onChanged: (value) {
+                        setState(() {
+                          Keterangan = value;
+                        });
+                      },
                       maxLines: 4,
                       decoration: InputDecoration(
                         labelText: 'Masukkan Keterangan Anda',
@@ -190,6 +210,12 @@ class _BodyState extends State<Body> {
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
+                      controller: judul,
+                      onChanged: (value) {
+                        setState(() {
+                          Tanggal = value;
+                        });
+                      },
                       decoration: InputDecoration(
                         labelText: 'Tanggal Cek Kesehatan Anda',
                         border: OutlineInputBorder(
@@ -248,6 +274,12 @@ class _BodyState extends State<Body> {
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
+                      controller: judul,
+                      onChanged: (value) {
+                        setState(() {
+                          Biaya = value;
+                        });
+                      },
                       decoration: InputDecoration(
                         labelText: 'Rp. xxxxxxxxx,-',
                         border: OutlineInputBorder(
