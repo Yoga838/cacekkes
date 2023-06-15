@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:geolocator/geolocator.dart';
 
 class AddPage extends StatelessWidget {
   const AddPage({Key? key});
@@ -9,6 +12,14 @@ class AddPage extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              // Aksi yang ingin Anda lakukan saat tombol "Back" ditekan
+              // Misalnya, navigasi ke halaman sebelumnya
+              Navigator.pop(context);
+            },
+          ),
           backgroundColor: Color(0xff57C5B6),
           title: Center(
             child: Text(
@@ -35,7 +46,40 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  String inputValue = '';
+  TextEditingController _label = TextEditingController();
+  double latitude = 0.0;
+  double longitude = 0.0;
+  File? _image;
+
+  void handleAutoFill() {
+    setState(() {
+      _label.text = latitude.toString() + " " + longitude.toString();
+    });
+  }
+
+  Future<void> _getImageFromCamera() async {
+    final pickedImage =
+        await ImagePicker().pickImage(source: ImageSource.camera);
+    if (pickedImage != null) {
+      setState(() {
+        _image = File(pickedImage.path);
+      });
+    }
+  }
+
+  Future<void> _getgeolocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      Geolocator.requestPermission();
+    } else if (permission == LocationPermission.deniedForever) {
+      Geolocator.requestPermission();
+    }
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    latitude = position.latitude;
+    longitude = position.longitude;
+    handleAutoFill();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,12 +103,21 @@ class _BodyState extends State<Body> {
               height: 30,
             ),
             InkWell(
-              onTap: () {},
+              onTap: _getImageFromCamera,
               child: SizedBox(
                 child: GestureDetector(
-                  onTap: () {},
-                  child: Image.asset('images/foto.png'),
-                ),
+                    onTap: _getImageFromCamera,
+                    child: _image == null
+                        ? Image.asset(
+                            'images/foto.png',
+                            width: 300,
+                            height: 200,
+                          )
+                        : Image.file(
+                            _image!,
+                            width: 300,
+                            height: 200,
+                          )),
               ),
             ),
             Text(
@@ -160,11 +213,13 @@ class _BodyState extends State<Body> {
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
+                      controller: _label,
                       decoration: InputDecoration(
-                        labelText: 'Lang xxxxxx Lat xxxxxx',
+                        labelText: "lang xxxxxx lat xxxxxx",
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: Color(0xff002B5B))),
                         filled: true,
+                        enabled: false,
                         fillColor: Color(0xffACE2DA),
                       ),
                     ),
@@ -173,7 +228,9 @@ class _BodyState extends State<Body> {
               ),
             ),
             ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  _getgeolocation();
+                },
                 style: ElevatedButton.styleFrom(
                     fixedSize: Size(145, 30),
                     backgroundColor: Color(0xff18AE8E)),
