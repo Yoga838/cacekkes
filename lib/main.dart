@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
           body: ListView(
         children: [
           Container(
-            margin: EdgeInsets.fromLTRB(0, 70, 0, 0),
+            margin: EdgeInsets.fromLTRB(0, 100, 0, 0),
             child: Column(
               children: [
                 Center(child: Image.asset("images/index.png")),
@@ -33,6 +33,9 @@ class MyApp extends StatelessWidget {
                     fontSize: 37,
                     fontWeight: FontWeight.w900,
                   ),
+                ),
+                SizedBox(
+                  height: 110,
                 ),
                 Container(
                     margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
