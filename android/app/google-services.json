@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "778018924973",
+    "project_id": "cacekkes-4e066",
+    "storage_bucket": "cacekkes-4e066.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:778018924973:android:28d7502834b7f5c79f1924",
+        "android_client_info": {
+          "package_name": "com.example.cacekkes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "778018924973-kb73fom95iv7v5adjuhn64erj5nmjush.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLCTZZYJclLphNed-PWBEZbh434w4f3n0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "778018924973-kb73fom95iv7v5adjuhn64erj5nmjush.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "778018924973-40ru7iggd3umkjrjnp2ddgrofnl7lpv7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cacekkes"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

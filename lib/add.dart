@@ -2,37 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:geolocator/geolocator.dart';
+import 'dashboard.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddPage extends StatelessWidget {
   const AddPage({Key? key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              // Aksi yang ingin Anda lakukan saat tombol "Back" ditekan
-              // Misalnya, navigasi ke halaman sebelumnya
-              Navigator.pop(context);
-            },
-          ),
-          backgroundColor: Color(0xff57C5B6),
-          title: Center(
-            child: Text(
-              "CaCekKes",
-              style: TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 32,
-                color: Color(0xff002B5B),
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        backgroundColor: Color(0xff57C5B6),
+        title: Center(
+          child: Text(
+            "CaCekKes",
+            style: TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 32,
+              color: Color(0xff002B5B),
             ),
           ),
         ),
-        body: SafeArea(child: Body()),
+      ),
+      body: SafeArea(
+        child: Body(),
       ),
     );
   }
@@ -51,10 +51,16 @@ class _BodyState extends State<Body> {
   double longitude = 0.0;
   File? _image;
   TextEditingController judul = TextEditingController();
+  TextEditingController keterangan = TextEditingController();
+  TextEditingController tanggal = TextEditingController();
+  TextEditingController biaya = TextEditingController();
   String Judul = '';
   String Keterangan = '';
   String Tanggal = '';
   String Biaya = '';
+  String imageUrl = '';
+  CollectionReference _reference =
+      FirebaseFirestore.instance.collection('data');
 
   void handleAutoFill() {
     setState(() {
@@ -63,27 +69,45 @@ class _BodyState extends State<Body> {
   }
 
   Future<void> _getImageFromCamera() async {
-    final pickedImage =
+    XFile? pickedImage =
         await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedImage != null) {
       setState(() {
         _image = File(pickedImage.path);
       });
+      Reference referenceRoot = FirebaseStorage.instance.ref();
+      Reference referenceDirImages = referenceRoot.child("image");
+      String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference referenceImageToUpload =
+          referenceDirImages.child(uniqueFileName);
+      try {
+        await referenceImageToUpload.putFile(File(pickedImage.path));
+        imageUrl = await referenceImageToUpload.getDownloadURL();
+      } catch (error) {
+        imageUrl = 'error';
+      }
     }
   }
 
   Future<void> _getgeolocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      Geolocator.requestPermission();
-    } else if (permission == LocationPermission.deniedForever) {
-      Geolocator.requestPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
     }
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    latitude = position.latitude;
-    longitude = position.longitude;
-    handleAutoFill();
+    if (permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always) {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      latitude = position.latitude;
+      longitude = position.longitude;
+      handleAutoFill();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Permission to access location denied')),
+      );
+    }
   }
 
   @override
@@ -111,18 +135,19 @@ class _BodyState extends State<Body> {
               onTap: _getImageFromCamera,
               child: SizedBox(
                 child: GestureDetector(
-                    onTap: _getImageFromCamera,
-                    child: _image == null
-                        ? Image.asset(
-                            'images/foto.png',
-                            width: 300,
-                            height: 200,
-                          )
-                        : Image.file(
-                            _image!,
-                            width: 300,
-                            height: 200,
-                          )),
+                  onTap: _getImageFromCamera,
+                  child: _image == null
+                      ? Image.asset(
+                          'images/foto.png',
+                          width: 300,
+                          height: 200,
+                        )
+                      : Image.file(
+                          _image!,
+                          width: 300,
+                          height: 200,
+                        ),
+                ),
               ),
             ),
             SizedBox(
@@ -179,7 +204,7 @@ class _BodyState extends State<Body> {
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
-                      controller: judul,
+                      controller: keterangan,
                       onChanged: (value) {
                         setState(() {
                           Keterangan = value;
@@ -210,7 +235,7 @@ class _BodyState extends State<Body> {
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
-                      controller: judul,
+                      controller: tanggal,
                       onChanged: (value) {
                         setState(() {
                           Tanggal = value;
@@ -254,15 +279,18 @@ class _BodyState extends State<Body> {
               ),
             ),
             ElevatedButton(
-                onPressed: () {
-                  _getgeolocation();
-                },
-                style: ElevatedButton.styleFrom(
-                    fixedSize: Size(145, 30),
-                    backgroundColor: Color(0xff18AE8E)),
-                child: Row(
-                  children: [Text("lokasi akurat  "), Icon(Icons.location_on)],
-                )),
+              onPressed: _getgeolocation,
+              style: ElevatedButton.styleFrom(
+                fixedSize: Size(145, 30),
+                backgroundColor: Color(0xff18AE8E),
+              ),
+              child: Row(
+                children: [
+                  Text("lokasi akurat  "),
+                  Icon(Icons.location_on),
+                ],
+              ),
+            ),
             Container(
               margin: EdgeInsets.fromLTRB(30, 10, 30, 0),
               child: Row(
@@ -274,7 +302,7 @@ class _BodyState extends State<Body> {
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
-                      controller: judul,
+                      controller: biaya,
                       onChanged: (value) {
                         setState(() {
                           Biaya = value;
@@ -298,19 +326,64 @@ class _BodyState extends State<Body> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(right: 10.0),
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        fixedSize: Size(80, 30),
-                        backgroundColor: Color(0xffFF0000),
+                    child: Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => dashboard(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          fixedSize: Size(80, 30),
+                          backgroundColor: Color(0xffFF0000),
+                        ),
+                        child: Text('Batal'),
                       ),
-                      child: Text('Batal'),
                     ),
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: 10.0),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        if (imageUrl.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('foto tidak ada')),
+                          );
+                          return;
+                        }
+                        Map<String, dynamic> DataSend = {
+                          'judul': Judul,
+                          'imageUrl': imageUrl,
+                          'keterangan': Keterangan,
+                          'tanggal': Tanggal,
+                          'longitude': longitude,
+                          'latitude': latitude,
+                          'biaya': Biaya,
+                        };
+                        await _reference.add(DataSend);
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Berhasil !!"),
+                              content: Text("Data Berhasil Disimpan"),
+                              actions: [
+                                ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => dashboard(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text('OK'))
+                              ],
+                            );
+                          },
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         fixedSize: Size(100, 30),
                         backgroundColor: Color(0xff002B5B),
@@ -320,6 +393,9 @@ class _BodyState extends State<Body> {
                   ),
                 ],
               ),
+            ),
+            SizedBox(
+              height: 50,
             ),
             // Adding extra space at the bottom for illustration
           ],

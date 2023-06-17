@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'add.dart';
 
@@ -24,6 +26,12 @@ class body extends StatefulWidget {
 }
 
 class _bodyState extends State<body> {
+  Future<List<QueryDocumentSnapshot>> fetchData() async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('data').get();
+    return querySnapshot.docs;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -72,97 +80,152 @@ class _bodyState extends State<body> {
                             style: TextStyle(
                                 color: Colors.white, letterSpacing: 1),
                           ),
+                          //content
                           Container(
-                            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(25)),
-                            padding: EdgeInsets.all(25),
-                            width: 370,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                    child: Image.asset(
-                                  "images/index.png",
-                                  width: 100,
-                                )),
-                                Expanded(
-                                  flex: 2,
-                                  child: Container(
-                                    margin: EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          "Cek Kesehatan 1",
-                                          style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xFF002B5B)),
-                                        ),
-                                        Text(
-                                          "Keterangan :  Cek asam urat, cabut gigi dan konsultasi kesehatan",
-                                          style: TextStyle(
-                                            color: Color(0xFF002B5B),
-                                          ),
-                                          textAlign: TextAlign.left,
-                                        ),
-                                        Text(
-                                          "Tanggal : 20 Mei 2020             ",
-                                          style: TextStyle(
-                                              color: Color(0xFF002B5B)),
-                                          textAlign: TextAlign.left,
-                                        ),
-                                        Text(
-                                          "Lokasi : lang: xxxx long xxxx             ",
-                                          style: TextStyle(
-                                              color: Color(0xFF002B5B)),
-                                          textAlign: TextAlign.left,
-                                        ),
-                                        Text(
-                                          "Biaya :  Rp 500.000,-                 ",
-                                          style: TextStyle(
-                                              color: Color(0xFF002B5B)),
-                                          textAlign: TextAlign.left,
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Container(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  // Add your button click logic here
-                                                },
-                                                child: Image.asset(
-                                                    "images/location.png"),
+                            margin: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                            // decoration: BoxDecoration(
+                            //     color: Colors.white,
+                            //     borderRadius: BorderRadius.circular(25)),
+                            // padding: EdgeInsets.all(25),
+                            // width: 370,
+                            child: FutureBuilder<List<QueryDocumentSnapshot>>(
+                              future: fetchData(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<List<QueryDocumentSnapshot>>
+                                      snapshot) {
+                                if (snapshot.hasData) {
+                                  List<QueryDocumentSnapshot> data =
+                                      snapshot.data!;
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: data.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      Map<String, dynamic> documentData =
+                                          data[index].data()
+                                              as Map<String, dynamic>;
+                                      return Container(
+                                        margin:
+                                            EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(25)),
+                                        padding: EdgeInsets.all(25),
+                                        width: 370,
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+
+                                                //immage from firebase
+                                                child: Image.network(
+                                                    documentData['imageUrl'],
+                                                    width: 100)),
+                                            Expanded(
+                                              flex: 2,
+                                              child: Container(
+                                                margin: EdgeInsets.fromLTRB(
+                                                    30, 0, 0, 0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      documentData['judul'],
+                                                      style: TextStyle(
+                                                        fontSize: 24,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color:
+                                                            Color(0xFF002B5B),
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                    Text(
+                                                      "Keterangan: ${documentData['keterangan']}",
+                                                      style: TextStyle(
+                                                          color: Color(
+                                                              0xFF002B5B)),
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                    ),
+                                                    Text(
+                                                      "Tanggal: ${documentData['tanggal']}",
+                                                      style: TextStyle(
+                                                          color: Color(
+                                                              0xFF002B5B)),
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                    ),
+                                                    Text(
+                                                      "Lokasi: ${documentData['lokasi']}",
+                                                      style: TextStyle(
+                                                          color: Color(
+                                                              0xFF002B5B)),
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                    ),
+                                                    Text(
+                                                      "Biaya: ${documentData['biaya']}",
+                                                      style: TextStyle(
+                                                          color: Color(
+                                                              0xFF002B5B)),
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                    ),
+                                                    SizedBox(height: 10),
+                                                    Container(
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              // Add your button click logic here
+                                                            },
+                                                            child: Image.asset(
+                                                                "images/location.png"),
+                                                          ),
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              // Add your button click logic here
+                                                            },
+                                                            child: Image.asset(
+                                                                "images/edit.png"),
+                                                          ),
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              // Add your button click logic here
+                                                            },
+                                                            child: Image.asset(
+                                                                "images/delete.png"),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  // Add your button click logic here
-                                                },
-                                                child: Image.asset(
-                                                    "images/edit.png"),
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  // Add your button click logic here
-                                                },
-                                                child: Image.asset(
-                                                    "images/delete.png"),
-                                              )
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                      );
+                                    },
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Text("Error: ${snapshot.error}");
+                                } else {
+                                  return CircularProgressIndicator();
+                                }
+                              },
                             ),
                           ),
+                          SizedBox(
+                            height: 50,
+                          )
                         ],
                       ),
                     ),
