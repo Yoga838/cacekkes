@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dashboard.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,9 +12,7 @@ void main() async {
 
   runApp(MaterialApp(
     home: MyApp(),
-    routes: {
-      '/dashboard': (context) => dashboard(),
-    },
+    routes: {'/home': (context) => home()},
   ));
 }
 
@@ -29,7 +28,7 @@ class MyApp extends StatelessWidget {
           body: ListView(
         children: [
           Container(
-            margin: EdgeInsets.fromLTRB(0, 100, 0, 0),
+            margin: EdgeInsets.fromLTRB(0, 70, 0, 0),
             child: Column(
               children: [
                 Center(child: Image.asset("images/index.png")),
@@ -45,11 +44,11 @@ class MyApp extends StatelessWidget {
                   height: 110,
                 ),
                 Container(
-                    margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
-                    padding: EdgeInsets.fromLTRB(0, 30, 0, 10),
+                    margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                    padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
                     width: double.infinity,
                     alignment: Alignment.topCenter,
-                    height: 370,
+                    height: 400,
                     decoration: BoxDecoration(
                         color: Color(0xFF57C5B6),
                         borderRadius: BorderRadius.only(
@@ -67,12 +66,13 @@ class MyApp extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                           child: Text(
-                            "Di aplikasi CaCekKes (Catatan Riwayat Cek Kesehatan). Aplikasi ini diciptakan untuk memudahkan anda dalam mencatat, mendokumentasikan, serta menemukan lokasi anda pada saat melakukan cek kesehatan di tempat kesehatan",
+                            "Di aplikasi CaCekKes (Catatan  Cek Kesehatan). Aplikasi ini diciptakan untuk memudahkan anda dalam memberikan catatan ulasan setelah melakukan cek kesehatan dan  mendokumentasikan, serta menemukan lokasi anda pada saat melakukan cek kesehatan di tempat kesehatan. Perlu diketahui bahwa catatan ini bersifat publik dan anomim, maka harap memberikan catatan yang baik dan benar.",
                             style: TextStyle(
                               fontWeight: FontWeight.w400,
-                              fontSize: 24,
+                              fontSize: 18,
                               color: Colors.white,
                             ),
+                            textAlign: TextAlign.justify,
                           ),
                         ),
                         ElevatedButton(
@@ -81,7 +81,7 @@ class MyApp extends StatelessWidget {
                               shape: StadiumBorder()),
                           child: Text('Lanjutkan'),
                           onPressed: () {
-                            Navigator.pushNamed(context, '/dashboard');
+                            Navigator.pushNamed(context, '/home');
                           },
                         ),
                       ],

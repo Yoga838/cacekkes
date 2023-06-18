@@ -100,10 +100,21 @@ class _BodyState extends State<Body> {
       latitude = position.latitude;
       longitude = position.longitude;
       handleAutoFill();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Permission to access location denied')),
-      );
+    } else if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.whileInUse ||
+          permission == LocationPermission.always) {
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+        latitude = position.latitude;
+        longitude = position.longitude;
+        handleAutoFill();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Permission to access location denied')),
+        );
+      }
     }
   }
 
@@ -132,7 +143,7 @@ class _BodyState extends State<Body> {
           children: [
             SizedBox(height: 20),
             Text(
-              "Tambah Riwayat Cek",
+              "Tambah Ulasan Cek",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 32, color: Color(0xff002B5B)),
             ),
@@ -167,11 +178,11 @@ class _BodyState extends State<Body> {
               height: 20,
             ),
             Text(
-              "*Pastikan Resep obat, kwitansi & tampak ",
+              "*Tambahkan foto yang",
               style: TextStyle(color: Color(0xFFBC0D0D)),
             ),
             Text(
-              "bangunan masuk frame",
+              "menggambarakan keadaan ulasan",
               style: TextStyle(color: Color(0xFFBC0D0D)),
             ),
             SizedBox(height: 50),
@@ -193,7 +204,7 @@ class _BodyState extends State<Body> {
                         });
                       },
                       decoration: InputDecoration(
-                        labelText: 'Masukkan Judul Catatan Anda',
+                        labelText: 'Masukan nama rumah sakit',
                         border: OutlineInputBorder(
                             borderSide: BorderSide(color: Color(0xff002B5B))),
                         filled: true,
@@ -288,19 +299,23 @@ class _BodyState extends State<Body> {
                 ],
               ),
             ),
-            ElevatedButton(
-              onPressed: _getgeolocation,
-              style: ElevatedButton.styleFrom(
-                fixedSize: Size(145, 30),
-                backgroundColor: Color(0xff18AE8E),
-              ),
-              child: Row(
-                children: [
-                  Text("lokasi akurat  "),
-                  Icon(Icons.location_on),
-                ],
+            Container(
+              margin: EdgeInsets.fromLTRB(50, 0, 0, 0),
+              child: ElevatedButton(
+                onPressed: _getgeolocation,
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size(145, 30),
+                  backgroundColor: Color(0xff18AE8E),
+                ),
+                child: Row(
+                  children: [
+                    Text("lokasi akurat  "),
+                    Icon(Icons.location_on),
+                  ],
+                ),
               ),
             ),
+
             Container(
               margin: EdgeInsets.fromLTRB(30, 10, 30, 0),
               child: Row(
@@ -331,26 +346,25 @@ class _BodyState extends State<Body> {
               ),
             ),
             Container(
-              margin: EdgeInsets.fromLTRB(120, 10, 30, 0),
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
                     padding: EdgeInsets.only(right: 10.0),
-                    child: Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => dashboard(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          fixedSize: Size(80, 30),
-                          backgroundColor: Color(0xffFF0000),
-                        ),
-                        child: Text('Batal'),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => dashboard(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        fixedSize: Size(80, 30),
+                        backgroundColor: Color(0xffFF0000),
                       ),
+                      child: Text('Batal'),
                     ),
                   ),
                   Padding(

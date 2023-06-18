@@ -6,8 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'add.dart';
 import 'route.dart';
 
-class dashboard extends StatelessWidget {
-  const dashboard({Key? key});
+class list_rs extends StatelessWidget {
+  const list_rs({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +31,8 @@ class _BodyState extends State<Body> {
   final TextEditingController _searchController = TextEditingController();
 
   Future<List<QueryDocumentSnapshot>> fetchData() async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('data')
-        .orderBy('tanggal', descending: true)
-        .get();
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('rumahsakit').get();
     return querySnapshot.docs;
   }
 
@@ -46,7 +44,7 @@ class _BodyState extends State<Body> {
       return data.where((snapshot) {
         Map<String, dynamic> documentData =
             snapshot.data() as Map<String, dynamic>;
-        String title = documentData['judul'].toString().toLowerCase();
+        String title = documentData['kecamatan'].toString().toLowerCase();
         return title.contains(query.toLowerCase());
       }).toList();
     }
@@ -63,22 +61,6 @@ class _BodyState extends State<Body> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        floatingActionButton: SizedBox(
-          width: 110,
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AddPage()),
-              );
-            },
-            child: Text("Tambahkan"),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            backgroundColor: Color(0xFF002B5B),
-          ),
-        ),
         body: ListView(
           children: [
             Container(
@@ -103,7 +85,7 @@ class _BodyState extends State<Body> {
                           height: 10,
                         ),
                         Text(
-                          "Daftar Ulasan Cek Kesehatan",
+                          "Daftar Rumah Sakit Di Jemnber",
                           style: TextStyle(
                             color: Colors.white,
                             letterSpacing: 1,
@@ -118,7 +100,7 @@ class _BodyState extends State<Body> {
                               setState(() {});
                             },
                             decoration: InputDecoration(
-                              labelText: 'Cari berdasarkan nama RS',
+                              labelText: 'Cari berdasarkan Kecamatan',
                               prefixIcon: Icon(Icons.search),
                               border: OutlineInputBorder(
                                 borderRadius:
@@ -162,11 +144,12 @@ class _BodyState extends State<Body> {
                                       child: Row(
                                         children: [
                                           Expanded(
-                                            child: Image.network(
-                                              documentData['imageUrl'],
-                                              width: 100,
-                                            ),
-                                          ),
+                                              child: documentData['imageUrl'] !=
+                                                      null
+                                                  ? Image.network(
+                                                      documentData['imageUrl'])
+                                                  : Image.asset(
+                                                      "images/hostpital.png")),
                                           Expanded(
                                             flex: 2,
                                             child: Container(
@@ -177,7 +160,7 @@ class _BodyState extends State<Body> {
                                                     CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    documentData['judul'],
+                                                    documentData['rumah_sakit'],
                                                     style: TextStyle(
                                                       fontSize: 24,
                                                       fontWeight:
@@ -187,28 +170,28 @@ class _BodyState extends State<Body> {
                                                     textAlign: TextAlign.center,
                                                   ),
                                                   Text(
-                                                    "Keterangan: ${documentData['keterangan']}",
+                                                    "Kecamatan: ${documentData['kecamatan']}",
                                                     style: TextStyle(
                                                       color: Color(0xFF002B5B),
                                                     ),
                                                     textAlign: TextAlign.start,
                                                   ),
                                                   Text(
-                                                    "Tanggal: ${documentData['tanggal']}",
+                                                    "Alamat: ${documentData['alamat']}",
                                                     style: TextStyle(
                                                       color: Color(0xFF002B5B),
                                                     ),
                                                     textAlign: TextAlign.start,
                                                   ),
                                                   Text(
-                                                    "Lokasi: ${documentData['latitude']} ${documentData['longitude']}",
+                                                    "Buka: ${documentData['buka']}",
                                                     style: TextStyle(
                                                       color: Color(0xFF002B5B),
                                                     ),
                                                     textAlign: TextAlign.start,
                                                   ),
                                                   Text(
-                                                    "Biaya: ${documentData['biaya']}",
+                                                    "Kontak: ${documentData['kontak']}",
                                                     style: TextStyle(
                                                       color: Color(0xFF002B5B),
                                                     ),

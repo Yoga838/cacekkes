@@ -41,6 +41,9 @@ dependencies:
   firebase_storage: ^11.2.3
   cloud_firestore: ^4.8.1
   intl: ^0.18.1
+  url_launcher: ^6.1.11
+
+ 
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +74,8 @@ flutter:
     - images/delete.png
     - images/location.png
     - images/foto.png
+    - images/cekkes.png
+    - images/hostpital.png
     # - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
