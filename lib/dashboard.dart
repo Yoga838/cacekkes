@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'add.dart';
+import 'route.dart';
 
 class dashboard extends StatelessWidget {
   const dashboard({Key? key});
@@ -28,8 +29,10 @@ class _BodyState extends State<Body> {
   final TextEditingController _searchController = TextEditingController();
 
   Future<List<QueryDocumentSnapshot>> fetchData() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('data').get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('data')
+        .orderBy('tanggal', descending: true)
+        .get();
     return querySnapshot.docs;
   }
 
@@ -210,25 +213,34 @@ class _BodyState extends State<Body> {
                                                           MainAxisAlignment.end,
                                                       children: [
                                                         InkWell(
-                                                            child: SizedBox(
-                                                          child:
-                                                              GestureDetector(
-                                                            onTap: () {},
-                                                            child: Icon(
-                                                              Icons
-                                                                  .maps_home_work,
-                                                              size: 30,
+                                                          child: SizedBox(
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: () {
+                                                                Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            RoutePage(
+                                                                      latitude:
+                                                                          documentData[
+                                                                              'latitude'],
+                                                                      longitude:
+                                                                          documentData[
+                                                                              'longitude'],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              child: Icon(
+                                                                Icons
+                                                                    .maps_home_work,
+                                                                size: 30,
+                                                              ),
                                                             ),
                                                           ),
-                                                        ))
-
-                                                        //     GestureDetector(
-                                                        //   onTap: () {
-                                                        //     // Add your button click logic here
-                                                        //   },
-                                                        //   child: Image.asset(
-                                                        //       "images/location.png"),
-                                                        // ),
+                                                        ),
                                                       ],
                                                     ),
                                                   ),

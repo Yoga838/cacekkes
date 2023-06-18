@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'dashboard.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class AddPage extends StatelessWidget {
   const AddPage({Key? key});
@@ -52,7 +53,7 @@ class _BodyState extends State<Body> {
   File? _image;
   TextEditingController judul = TextEditingController();
   TextEditingController keterangan = TextEditingController();
-  TextEditingController tanggal = TextEditingController();
+  TextEditingController _dateController = TextEditingController();
   TextEditingController biaya = TextEditingController();
   String Judul = '';
   String Keterangan = '';
@@ -91,10 +92,6 @@ class _BodyState extends State<Body> {
 
   Future<void> _getgeolocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-    }
     if (permission == LocationPermission.whileInUse ||
         permission == LocationPermission.always) {
       Position position = await Geolocator.getCurrentPosition(
@@ -107,6 +104,22 @@ class _BodyState extends State<Body> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Permission to access location denied')),
       );
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? selectedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+
+    if (selectedDate != null) {
+      setState(() {
+        _dateController.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+        Tanggal = DateFormat('yyyy-MM-dd').format(selectedDate);
+      });
     }
   }
 
@@ -235,12 +248,9 @@ class _BodyState extends State<Body> {
                   SizedBox(width: 10),
                   Expanded(
                     child: TextField(
-                      controller: tanggal,
-                      onChanged: (value) {
-                        setState(() {
-                          Tanggal = value;
-                        });
-                      },
+                      controller: _dateController,
+                      readOnly: true,
+                      onTap: () => _selectDate(context),
                       decoration: InputDecoration(
                         labelText: 'Tanggal Cek Kesehatan Anda',
                         border: OutlineInputBorder(
